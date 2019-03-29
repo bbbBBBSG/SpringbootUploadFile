@@ -1,0 +1,8 @@
+# 端口
+server:
+  port: 8081
+# 配置虚拟路径和具体路径 一个是Linux路径，一个是Windows路径
+file:
+  staticAccessPath: /api/file/**
+  uploadFolder: /root/uploadFiles/
+#  uploadFolder: d://uploadFiles/
