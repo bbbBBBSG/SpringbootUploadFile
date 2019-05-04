@@ -7,7 +7,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,21 +39,31 @@ public class FileController {
             return response;
         }
 
-
         String fileName = file.getOriginalFilename();
 
         String suffixName = fileName.substring(fileName.lastIndexOf("."));
 
         fileName = UUID.randomUUID() + suffixName;
 
-        File dest = new File(uploadFolder + fileName);
+        String fileDir = request.getHeader("file_dir");
+
+        if (fileDir!=null && fileDir.length()!=0) {
+            fileDir = fileDir + "/";
+        } else {
+            fileDir = "common/";
+        }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+        fileDir = fileDir + format.format(new Date())+"/";
+
+        File dest = new File(uploadFolder + fileDir + fileName);
 
         if (!dest.getParentFile().exists()) {
             dest.getParentFile().mkdirs();
         }
         try {
             file.transferTo(dest);
-            response.result = "/api/file/"+fileName;
+            // api/file/test/2019-05/
+            response.result = "/api/file/"+fileDir;
             return response;
         } catch (IllegalStateException e) {
             e.printStackTrace();
