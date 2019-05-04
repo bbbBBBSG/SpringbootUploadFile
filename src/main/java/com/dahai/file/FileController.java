@@ -63,7 +63,7 @@ public class FileController {
         try {
             file.transferTo(dest);
             // api/file/test/2019-05/
-            response.result = "/api/file/"+fileDir;
+            response.result = "/api/file/"+fileDir+fileName;
             return response;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -87,7 +87,18 @@ public class FileController {
             return response;
         }
 
-        File dest = new File(uploadFolder);
+        String fileDir = request.getHeader("file_dir");
+
+        if (fileDir!=null && fileDir.length()!=0) {
+            fileDir = fileDir + "/";
+        } else {
+            fileDir = "common/";
+        }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+        fileDir = fileDir + format.format(new Date())+"/";
+
+
+        File dest = new File(uploadFolder + fileDir);
 
         if (!dest.exists()) {
             dest.mkdirs();
@@ -107,8 +118,8 @@ public class FileController {
 
                     String suffixName = fileName.substring(fileName.lastIndexOf("."));
                     fileName = UUID.randomUUID() + suffixName;
-                    paths.add("/api/file/"+fileName);
-                    stream = new BufferedOutputStream(new FileOutputStream(new File(uploadFolder + fileName)));
+                    paths.add("/api/file/"+fileDir+fileName);
+                    stream = new BufferedOutputStream(new FileOutputStream(new File(dest.getAbsolutePath() + fileName)));
                     stream.write(bytes);
                     stream.close();
                 } catch (Exception e) {
